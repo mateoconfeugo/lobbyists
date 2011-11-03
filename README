@@ -19,7 +19,7 @@ useful for finding anomalies in the files and for making the data available to o
 software. The XML files are very large and the database is relatively 
 easier to access. In any case, it shouldn't be too
 difficult to create new tables from the data that can be analyzed. Another use is 
-to supplement and check the Center for Responsive Politics (CRP) version of the which is missing 
+to supplement and check the Center for Responsive Politics (CRP) version of the data which is missing 
 many of the variables (e.g. SOPR registrant ID, their physical address, etc.).
 The CRP data can be downloaded in bulk here: 
 http://www.opensecrets.org/
