@@ -1,5 +1,21 @@
 Parsing a Senate LD-1/LD-2 XML document with the lobbyists module is
-easy. Here's an example that parses a short document identified by its
+easy. 
+
+Here is an example of a short script that will load all the senate 
+files in a directory and insert them into a sqlite database:
+
+>>import os
+>>import lobbyists
+>>import lobbyists.util
+
+>>dir = '/SenateOfficeFiles/'
+>>files = sorted(os.listdir(dir), reverse=True)
+>>for file in files:
+>>    print dir+ file
+>>    lobbyists.util.load_db([dir+file], '/SenateOffice.sqlite')
+
+
+Here's an example that parses a short document identified by its
 filename.
 
 >>> from pprint import pprint
