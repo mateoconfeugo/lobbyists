@@ -862,7 +862,7 @@ def import_filings(cur, parsed_filings):
                 if entity_name in record:
                     entity_importer(record[entity_name], filing, cur)
         except:
-            print 'WARNING: problem with this filing, typically b/c its an identical duplicate:'
+            print 'WARNING: problem with this filing, typically b/c it is an identical duplicate:'
             print record['filing']['id']
     return cur
 
