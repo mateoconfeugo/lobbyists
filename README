@@ -8,15 +8,23 @@ downloadable here:
 
 http://www.senate.gov/legislative/Public_Disclosure/database_download.htm
 
-The SQL database schema used by the importer is a direct translation
-of the XML schema used in the Senate documents. This isn't a
-particularly useful format for analyzing lobbying data, but it is
-useful for analyzing the lobbying records themselves, which often
-contain errors or anomalies. In any case, it shouldn't be too
-difficult to adapt the importing code in this package to a more useful
-schema.
+Note that the 1996-98 files can be purchased directly from the Senate office for 
+$315. Not sure why they don't post them on the internet. These were the early 
+years of the Lobbying Disclosure Act of 1995. My guess is that compliance 
+with the law was not too great then anyhow.
 
-For information on how to interpret the LD-1/LD-2 database, see here:
+The SQL database schema used by the importer is a direct translation
+of the XML schema used in the Senate documents. This is
+useful for finding anomalies in the files and for making the data available to other 
+software. The XML files are very large and the database is relatively 
+easier to access. In any case, it shouldn't be too
+difficult to create new tables from the data that can be analyzed. Another use is 
+to supplement and check the Center for Responsive Politics (CRP) version of the which is missing 
+many of the variables (e.g. SOPR registrant ID, their physical address, etc.).
+The CRP data can be downloaded in bulk here: 
+http://www.opensecrets.org/
+
+For information on anomoalies in the LD-1/LD-2 database and some tips on how to interpret them, see here:
 
 http://watchdog.jottit.com/lobbying_database
 
@@ -30,8 +38,8 @@ This package requires Python 2.5.1 or later.
 SCRIPTS
 -------
 
-The lobbyists-load script loads one or more XML documents into a
-database.
+See the Howto.txt for a short script that will take a directory of the Senate's XML files 
+and insert them into a database.
 
 The lobbyists-benchmark script loads one XML document into a database,
 and reports the amount of time required to a) parse the document and
