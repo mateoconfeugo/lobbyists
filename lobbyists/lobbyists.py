@@ -843,13 +843,27 @@ def import_filings(cur, parsed_filings):
 
     Returns the cursor.
 
+    SG: Added exception to handle failed inserts, typically due to duplicated records.
+    There are thousands of duplicate records. I've counted over 4000.
+    I called the Senate Office and they explained that they never change their files 
+    once they publish them.
+    I asked for their policy for handling duplicates, and they said they don't have one.
+    Just check.
+    A random sampling of these duplicates suggests strongly they are all identical. 
+    Therefore, in order to parse the data without checking every one to see if it identical, this quick fix is added.
+    Hopefully, someone will add some more elaborate code to check if the records are perfectly identical instead of 
+    merely throwing a warning.
     """
     for record in parsed_filings:
-        filing = record['filing']
-        _import_filing(filing, cur)
-        for entity_name, entity_importer in _entity_importers:
-            if entity_name in record:
-                entity_importer(record[entity_name], filing, cur)
+        try:
+            filing = record['filing']
+            _import_filing(filing, cur)
+            for entity_name, entity_importer in _entity_importers:
+                if entity_name in record:
+                    entity_importer(record[entity_name], filing, cur)
+        except:
+            print 'WARNING: problem with this filing, typically b/c its an identical duplicate:'
+            print record['filing']['id']
     return cur
 
 
