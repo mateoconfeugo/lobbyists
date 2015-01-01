@@ -859,16 +859,21 @@ def import_filings(cur, parsed_filings):
     Hopefully, someone will add some more elaborate code to check if the records are perfectly identical instead of
     merely throwing a warning.
     """
-    for record in parsed_filings:
-        try:
-            filing = record['filing']
-            _import_filing(filing, cur)
-            for entity_name, entity_importer in _entity_importers:
-                if entity_name in record:
-                    entity_importer(record[entity_name], filing, cur)
-        except:
-            print 'WARNING: problem with this filing, typically b/c it is an identical duplicate:'
-            print record['filing']['id']
+    try:
+        for record in parsed_filings:
+            try:
+                filing = record['filing']
+                _import_filing(filing, cur)
+                for entity_name, entity_importer in _entity_importers:
+                    if entity_name in record:
+                        entity_importer(record[entity_name], filing, cur)
+
+            except:
+                print 'WARNING: problem with this filing, typically b/c it is an identical duplicate:'
+                print record['filing']['id']
+    except:
+        print "doh!"
+
     return cur
 
 
