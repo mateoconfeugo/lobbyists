@@ -18,7 +18,7 @@
 """Parse and import U.S. Senate LD-1/LD-2 XML documents."""
 
 import xml.dom.pulldom
-
+import sys
 
 VERSION = '0.12'
 
@@ -57,23 +57,28 @@ def _period(x):
 
 
 def _is_gov(x):
-    values = {None: 'unspecified', '0': 'n', '1': 'y'}
+    x = str(x)
+    values = {'None': 'unspecified', '0': 'n', '1': 'y' , 'FALSE': 'n'}
     return values[x]
 
-
 def _status(x):
-    status = {0: 'active',
-              1: 'terminated',
-              2: 'administratively terminated',
-              3: 'undetermined'}
-    return status[int(x)]
-
+    try:
+        status = {0: 'active',
+                  1: 'terminated',
+                  2: 'administratively terminated',
+                  3: 'undetermined'}
+        return status[int(x)]
+    except:
+        return 3
 
 def _lobbyist_indicator(x):
-    indicator = {0: 'not covered',
-                 1: 'covered',
-                 2: 'undetermined'}
-    return indicator[int(x)]
+    try:
+        indicator = {0: 'not covered',
+                     1: 'covered',
+                     2: 'undetermined'}
+        return indicator[int(x)]
+    except:
+        return 2
 
 
 # xml.dom.pulldom-specific code
@@ -186,7 +191,7 @@ def _parse_client(elt):
 _registrant_attrs = [('Address', 'address', _optional),
                      ('GeneralDescription', 'description', _optional),
                      ('RegistrantCountry', 'country', _identity),
-                     ('RegistrantID', 'senate_id', int),
+                     ('RegistrantID', 'senate_id', _identity),
                      ('RegistrantName', 'name', _identity),
                      ('RegistrantPPBCountry', 'ppb_country', _identity)]
 
@@ -695,7 +700,7 @@ def _import_affiliated_org(org, filing, cur):
     """Import an affiliated org into the database.
 
     Returns nothing.
-    
+
     Side-effects: may insert rows into the 'affiliated_org',
     'country', 'org', 'filing_affiliated_orgs', and 'url' tables.
 
@@ -767,7 +772,7 @@ def _import_foreign_entity(entity, filing, cur):
                  entity['contribution'],
                  entity['ownership_percentage'],
                  entity['status']])
-                 
+
 
 def _import_filing(filing, cur):
     """Import a filing into the database.
@@ -775,7 +780,7 @@ def _import_filing(filing, cur):
     Returns nothing.
 
     Side-effects: inserts a row into the 'filing' table.
-    
+
     filing - The parsed filing dictionary.
 
     cur - The DB API 2.0-compliant database cursor.
@@ -802,7 +807,7 @@ def _import_list(entities, filing, cur):
     Returns nothing.
 
     Side-effects: inserts rows into the database.
-    
+
     entitites - The list of parsed entities.
 
     filing - The parsed filing dictionary with which the list is
@@ -845,25 +850,30 @@ def import_filings(cur, parsed_filings):
 
     SG: Added exception to handle failed inserts, typically due to duplicated records.
     There are thousands of duplicate records. I've counted over 4000.
-    I called the Senate Office and they explained that they never change their files 
+    I called the Senate Office and they explained that they never change their files
     once they publish them.
     I asked for their policy for handling duplicates, and they said they don't have one.
     Just check.
-    A random sampling of these duplicates suggests strongly they are all identical. 
+    A random sampling of these duplicates suggests strongly they are all identical.
     Therefore, in order to parse the data without checking every one to see if it identical, this quick fix is added.
-    Hopefully, someone will add some more elaborate code to check if the records are perfectly identical instead of 
+    Hopefully, someone will add some more elaborate code to check if the records are perfectly identical instead of
     merely throwing a warning.
     """
-    for record in parsed_filings:
-        try:
-            filing = record['filing']
-            _import_filing(filing, cur)
-            for entity_name, entity_importer in _entity_importers:
-                if entity_name in record:
-                    entity_importer(record[entity_name], filing, cur)
-        except:
-            print 'WARNING: problem with this filing, typically b/c it is an identical duplicate:'
-            print record['filing']['id']
+    try:
+        for record in parsed_filings:
+            try:
+                filing = record['filing']
+                _import_filing(filing, cur)
+                for entity_name, entity_importer in _entity_importers:
+                    if entity_name in record:
+                        entity_importer(record[entity_name], filing, cur)
+
+            except:
+                print 'WARNING: problem with this filing, typically b/c it is an identical duplicate:'
+                print record['filing']['id']
+    except:
+        print "doh!"
+
     return cur
 
 
